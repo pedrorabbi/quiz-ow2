@@ -77,6 +77,7 @@ async function createHtmlTemplate() {
 
   const footnote = document.getElementById("footnote").value;
   const skipForm = document.getElementById("skipForm").value;
+  const calculating = document.getElementById("calculating").value;
   const adLabel = footnote; // Usar o mesmo valor do rodapé
   const title = document.getElementById("title").value;
   const description = "-";
@@ -169,6 +170,7 @@ async function createHtmlTemplate() {
         footnote: footnote,
         greeting: greeting,
         skipForm: skipForm,
+        calculating: calculating,
       },
       questions: questions,
       loaders: items.filter((item) => item.type === "loader"),
@@ -198,6 +200,7 @@ async function createHtmlTemplate() {
         footnote: footnote,
         greeting: greeting,
         skipForm: skipForm,
+        calculating: calculating,
       },
       questions: questions,
       loaders: items.filter((item) => item.type === "loader"),
@@ -692,6 +695,8 @@ function updatePreview(showTitleInForm = null) {
     const buttonText = document.getElementById("buttonText")?.value || "Enviar";
     const footnote =
       document.getElementById("footnote")?.value || "Rodapé do formulário";
+    const calculating =
+      document.getElementById("calculating")?.value || "Carregando...";
 
     // Aplicar no preview com verificações
     const previewAdLabel = document.getElementById("previewAdLabel");
@@ -1191,6 +1196,8 @@ function saveQuizToHistory() {
     emailLabel: document.getElementById("emailLabel").value,
     buttonText: document.getElementById("buttonText").value,
     footnote: document.getElementById("footnote").value,
+    skipForm: document.getElementById("skipForm").value,
+    calculating: document.getElementById("calculating").value,
     primaryColor: document.getElementById("primaryColor").value,
     secondaryColor: document.getElementById("secondaryColor").value,
     hoverColor: document.getElementById("hoverColor").value,
@@ -1500,6 +1507,8 @@ function duplicateQuiz(quizData) {
   document.getElementById("emailLabel").value = quizData.emailLabel || "";
   document.getElementById("buttonText").value = quizData.buttonText || "";
   document.getElementById("footnote").value = quizData.footnote || "";
+  document.getElementById("skipForm").value = quizData.skipForm || "";
+  document.getElementById("calculating").value = quizData.calculating || "";
   document.getElementById("primaryColor").value =
     quizData.primaryColor || "#22C55D";
   document.getElementById("secondaryColor").value =
@@ -1591,6 +1600,8 @@ function clearForm() {
   document.getElementById("emailLabel").value = "";
   document.getElementById("buttonText").value = "";
   document.getElementById("footnote").value = "";
+  document.getElementById("skipForm").value = "";
+  document.getElementById("calculating").value = "";
   document.getElementById("primaryColor").value = "#22C55D";
   document.getElementById("secondaryColor").value = "#16A349";
   document.getElementById("hoverColor").value = "#16A349";
