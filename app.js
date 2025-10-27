@@ -45,6 +45,17 @@ const upload = multer({
 });
 
 app.use(express.json());
+
+// Rotas para servir as diferentes views (ANTES do static para ter prioridade)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "ow-padrao.html"));
+});
+
+app.get("/ow-long", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "ow-long.html"));
+});
+
+// Servir arquivos estáticos (CSS, JS, imagens)
 app.use(express.static(path.join(__dirname, "public")));
 
 // Endpoint para fornecer configurações (sem expor chaves sensíveis diretamente)

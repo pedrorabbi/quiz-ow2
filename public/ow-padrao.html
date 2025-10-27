@@ -9,14 +9,31 @@
     <script src="./js/translation.js"></script>
     <script src="./script.js"></script>
   </head>
-  <body style="margin: 0; padding: 10px">
-    <!-- Loader de página inteira para tradução -->
-    <div id="page-loader" class="page-loader-overlay" style="display: none">
-      <div class="loader-content">
-        <div class="spinner"></div>
-        <span id="loader-text">Traduzindo...</span>
+  <body style="margin: 0; padding: 0; display: flex">
+    <!-- Menu lateral esquerdo -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Menu</h2>
       </div>
-    </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item active">
+          <a href="/">OW Padrão</a>
+        </li>
+        <li class="menu-item">
+          <a href="/ow-long">OW Long</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Conteúdo principal -->
+    <div class="main-content">
+      <!-- Loader de página inteira para tradução -->
+      <div id="page-loader" class="page-loader-overlay" style="display: none">
+        <div class="loader-content">
+          <div class="spinner"></div>
+          <span id="loader-text">Traduzindo...</span>
+        </div>
+      </div>
 
     <!-- Modal de sucesso -->
     <div id="success-modal" class="modal-overlay" style="display: none">
@@ -441,6 +458,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </body>
 </html>
