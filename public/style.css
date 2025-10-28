@@ -174,7 +174,26 @@ button[onclick="createHtmlTemplate()"] {
   background-color: #1baa50;
 }
 
+/* Botões OW Long */
+button[onclick="addQuestionLong()"] {
+  background-color: #2563eb;
+}
+
+button[onclick="addLoadingStepLong()"] {
+  background-color: #2563eb;
+}
+
+button[onclick="createQuizLong()"] {
+  background-color: #1baa50;
+}
+
 button[onclick^="addOption"] {
+  background-color: #d9d9d9;
+  border: 1px solid #ccc;
+  color: black;
+}
+
+button[onclick^="addOptionLong"] {
   background-color: #d9d9d9;
   border: 1px solid #ccc;
   color: black;
