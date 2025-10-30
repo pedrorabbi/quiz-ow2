@@ -53,3 +53,56 @@ export function showNotification(message, type = 'success') {
     setTimeout(() => notification.remove(), 300);
   }, 3000);
 }
+
+export function showQuizPreviewModal(quizUrl, quizHtml) {
+  // Criar modal overlay
+  const modalOverlay = document.createElement('div');
+  modalOverlay.className = 'modal-overlay';
+  modalOverlay.style.zIndex = '10001';
+
+  // Criar conteúdo do modal
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content';
+  modalContent.style.maxWidth = '90%';
+  modalContent.style.width = '800px';
+  modalContent.style.maxHeight = '90vh';
+
+  modalContent.innerHTML = `
+    <div class="modal-header">
+      <span class="success-icon">✓</span>
+      <h2>Quiz criado com sucesso!</h2>
+    </div>
+
+    <div class="modal-body">
+      <p style="margin-bottom: 15px;">
+        <strong>URL do Quiz:</strong><br>
+        <a href="${quizUrl}" target="_blank" style="color: #2563eb; word-break: break-all;">${quizUrl}</a>
+      </p>
+
+      <div style="margin-top: 20px;">
+        <p style="margin-bottom: 10px; font-weight: 600; color: #1f2937;">Preview do Quiz:</p>
+        <div style="border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: #f9fafb;">
+          <iframe
+            srcdoc="${quizHtml.replace(/"/g, '&quot;')}"
+            style="width: 100%; height: 500px; border: none; display: block;"
+            sandbox="allow-scripts allow-same-origin"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="close-button" onclick="this.closest('.modal-overlay').remove()">Fechar</button>
+    </div>
+  `;
+
+  modalOverlay.appendChild(modalContent);
+  document.body.appendChild(modalOverlay);
+
+  // Fechar modal ao clicar no overlay
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      modalOverlay.remove();
+    }
+  });
+}

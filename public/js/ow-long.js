@@ -1,12 +1,12 @@
 // OW Long - Lógica exclusiva para quiz long form
-import { showNotification } from './utils.js';
+import { showNotification, showQuizPreviewModal } from './utils.js';
 import { createQuizLink } from './api.js';
-import { saveQuizToHistory, renderQuizHistory } from './history.js';
+import { saveQuizToHistory, getQuizHistory, deleteQuizFromHistory, renderQuizHistory } from './history.js';
 import { renumberQuestions } from './dragdrop.js';
 import { addQuestion, addOption, removeQuestion, addLoader, removeLoader } from './questions.js';
 
 // Template HTML base para OW Long (minificado)
-const baseTemplate = `<!doctypehtml><html lang='en'><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1.0'><title>Quiz Minimalista</title><link href='https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap' rel='stylesheet'><style>:root{--bg-light:#f9fafb;--card-bg:#ffffff;--primary:#2563eb;--primary-hover:#1e40af;--text-dark:#1f2937;--text-light:#4b5563}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Roboto',sans-serif;background:var(--bg-light);display:flex;align-items:center;justify-content:center;height:100vh}.quiz-card{position:relative;background:var(--card-bg);border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05);width:100%;max-width:500px;padding:1rem;padding-top:2.5rem;text-align:center;overflow:hidden;height:100%}.progress{position:absolute;top:0;left:0;width:100%;height:6px;background:#e5e7eb}.progress__bar{height:100%;width:0;background:var(--primary);transition:width .4s;border-top-left-radius:12px;border-top-right-radius:12px}.question{font-size:1.25rem;color:var(--text-dark);margin-bottom:1rem;min-height:3rem;display:flex;align-items:center;justify-content:center}.options{display:grid;gap:.75rem;margin-bottom:2rem}.option,.recommend-btn{font-size:1rem;background:var(--primary);color:#fff;padding:1.25rem;border-radius:8px;text-decoration:none;font-weight:700;transition:background .3s;cursor:pointer;border:none}.option:hover,.recommend-btn:hover{background:var(--primary-hover)}.loading-step{display:none;flex-direction:column;align-items:center;gap:1rem;margin-bottom:2rem}.spinner{border:4px solid #e5e7eb;border-top:4px solid var(--primary);border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}.award-text{font-size:1.25rem;color:var(--text-dark);margin-bottom:1rem;font-weight:500}.loading-text{font-size:1rem;color:var(--text-dark)}.footnote{font-size:.875rem;color:var(--text-light)}</style><body><div class='quiz-card'><div class='progress'><div class='progress__bar'></div></div><div class='question'></div><div class='options'></div><div class='loading-step'><div class='spinner'></div><div class='loading-text'>Preparing your job matches…</div></div><a data-av-rewarded='true' id='submitLink' style='display:none'></a></div><script>const questions=[{q:'What hourly pay are you targeting (USD)?',opts:['$15–$18/hr','$19–$22/hr','$23–$28/hr','$29+/hr']},{q:'Which type of employment do you prefer?',opts:['Part-time','Full-time','Home Office']},{q:'When could you start?',opts:['Immediately','Within 1 week','Within 2 weeks','Next month']}];let idx=0;const questionEl=document.querySelector('.question'),optionsEl=document.querySelector('.options'),loadingEl=document.querySelector('.loading-step'),progressBar=document.querySelector('.progress__bar');function render(){questionEl.style.display='none';optionsEl.style.display='none';loadingEl.style.display='none';const e=questions.length+1;progressBar.style.width=idx/e*100+'%';if(idx<questions.length){const{q:e,opts:t}=questions[idx];questionEl.textContent=e;questionEl.style.display='flex';optionsEl.style.display='grid';optionsEl.innerHTML='';t.forEach(e=>{const t=document.createElement('button');t.className='option';t.textContent=e;t.addEventListener('click',e=>{e.preventDefault();idx++;render()});optionsEl.appendChild(t)})}else if(idx===questions.length){loadingEl.style.display='flex';setTimeout(()=>{idx++;render()},5e3)}else{optionsEl.style.display='grid';optionsEl.innerHTML='';const e=document.createElement('div');e.className='award-text';e.textContent='Job opportunities are waiting for you!';const t='http://redirect.customerchannels.com/rec-cc-cowl-jobs-us';optionsEl.appendChild(e);const n=document.createElement('button');n.className='recommend-btn';n.textContent='SEE JOBS';n.addEventListener('click',e=>{e.preventDefault();if(typeof window.parent.av!=='undefined'&&typeof window.parent!=='undefined'){const e=window.parent.av.slots.find(e=>e.type==='rewarded'&&e.lifecycle==='ready');if(!e){const e=new URL(window.top.location.href);console.log('OfferWallSlot não encontrado');const n=new Date;n.setDate(n.getDate()+7);document.cookie=['loaderCopy=','Domain=.customerchannels.com','Path=/',\`Expires=\${n.toUTCString()}\`,'SameSite=Lax'].join('; ');document.cookie=['rewardedReady=true','Domain=.customerchannels.com','Path=/',\`Expires=\${n.toUTCString()}\`,'SameSite=Lax'].join('; ');const o=\`\${t}\${e?.search}\`;window.parent.postMessage({action:'redirect',url:o},'*');return}}document.getElementById('submitLink').click()});optionsEl.appendChild(n);const o=document.createElement('div');o.className='footnote';o.textContent='See the ad to proceed';optionsEl.appendChild(o)}}render();<\/script></body></html>`;
+const baseTemplate = `<!doctypehtml><html lang='en'><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1.0'><title>Quiz Minimalista</title><link href='https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap' rel='stylesheet'><style>:root{--bg-light:#f9fafb;--card-bg:#ffffff;--primary:#2563eb;--primary-hover:#1e40af;--text-dark:#1f2937;--text-light:#4b5563}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Roboto',sans-serif;background:var(--bg-light);display:flex;align-items:center;justify-content:center;height:100vh}.quiz-card{position:relative;background:var(--card-bg);border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05);width:100%;max-width:500px;padding:1rem;padding-top:2.5rem;text-align:center;overflow:hidden;height:100%}.progress{position:absolute;top:0;left:0;width:100%;height:6px;background:#e5e7eb}.progress__bar{height:100%;width:0;background:var(--primary);transition:width .4s;border-top-left-radius:12px;border-top-right-radius:12px}.question{font-size:1.25rem;color:var(--text-dark);margin-bottom:1rem;min-height:3rem;display:flex;align-items:center;justify-content:center}.options{display:grid;gap:.75rem;margin-bottom:2rem}.option,.recommend-btn{font-size:1rem;background:var(--primary);color:#fff;padding:1.25rem;border-radius:8px;text-decoration:none;font-weight:700;transition:background .3s;cursor:pointer;border:none}.option:hover,.recommend-btn:hover{background:var(--primary-hover)}.loading-step{display:none;flex-direction:column;align-items:center;gap:1rem;margin-bottom:2rem}.spinner{border:4px solid #e5e7eb;border-top:4px solid var(--primary);border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}.award-text{font-size:1.25rem;color:var(--text-dark);margin-bottom:1rem;font-weight:500}.loading-text{font-size:1rem;color:var(--text-dark)}.footnote{font-size:.875rem;color:var(--text-light)}</style><body><div class='quiz-card'><div class='progress'><div class='progress__bar'></div></div><div class='question'></div><div class='options'></div><div class='loading-step'><div class='spinner'></div><div class='loading-text'>Preparing your job matches…</div></div><a data-av-rewarded='true' id='submitLink' style='display:none'></a></div><script>const questions=[{q:'What hourly pay are you targeting (USD)?',opts:['$15–$18/hr','$19–$22/hr','$23–$28/hr','$29+/hr']},{q:'Which type of employment do you prefer?',opts:['Part-time','Full-time','Home Office']},{q:'When could you start?',opts:['Immediately','Within 1 week','Within 2 weeks','Next month']}];let idx=0;const questionEl=document.querySelector('.question'),optionsEl=document.querySelector('.options'),loadingEl=document.querySelector('.loading-step'),progressBar=document.querySelector('.progress__bar');function render(){questionEl.style.display='none';optionsEl.style.display='none';loadingEl.style.display='none';const e=questions.length+1;progressBar.style.width=idx/e*100+'%';if(idx<questions.length){const{q:e,opts:t}=questions[idx];questionEl.textContent=e;questionEl.style.display='flex';optionsEl.style.display='grid';optionsEl.innerHTML='';t.forEach(e=>{const t=document.createElement('button');t.className='option';t.textContent=e;t.addEventListener('click',e=>{e.preventDefault();idx++;render()});optionsEl.appendChild(t)})}else if(idx===questions.length){loadingEl.style.display='flex';setTimeout(()=>{idx++;render()},5e3)}else{optionsEl.style.display='grid';optionsEl.innerHTML='';const e=document.createElement('div');e.className='award-text';e.textContent='Job opportunities are waiting for you!';const t='http://redirect.customerchannels.com/rec-cc-cowl-jobs-us';const s=document.getElementById('submitLink');s.href=t;optionsEl.appendChild(e);const n=document.createElement('button');n.className='recommend-btn';n.textContent='SEE JOBS';n.addEventListener('click',e=>{e.preventDefault();if(typeof window.parent.av!=='undefined'&&typeof window.parent!=='undefined'){const e=window.parent.av.slots.find(e=>e.type==='rewarded'&&e.lifecycle==='ready');if(!e){const e=new URL(window.top.location.href);console.log('OfferWallSlot não encontrado');const n=new Date;n.setDate(n.getDate()+7);document.cookie=['loaderCopy=','Domain=.customerchannels.com','Path=/',\`Expires=\${n.toUTCString()}\`,'SameSite=Lax'].join('; ');document.cookie=['rewardedReady=true','Domain=.customerchannels.com','Path=/',\`Expires=\${n.toUTCString()}\`,'SameSite=Lax'].join('; ');const o=\`\${t}\${e?.search}\`;window.parent.postMessage({action:'redirect',url:o},'*');return}}s.click()});optionsEl.appendChild(n);const o=document.createElement('div');o.className='footnote';o.textContent='See the ad to proceed';optionsEl.appendChild(o)}}render();<\/script></body></html>`;
 
 // Wrapper functions para usar o módulo unificado
 window.addQuestionLong = function() {
@@ -189,20 +189,25 @@ window.createQuizLong = async function() {
     // Fazer POST na API do custom-embed
     const result = await createQuizLink(modifiedHtml, vertical, domain);
 
-    if (result.url) {
-      const linkResponse = document.getElementById('linkResponse-long');
-      linkResponse.innerHTML = `
-        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-top: 10px;">
-          <p style="margin: 0 0 10px 0; font-weight: bold; color: #16a349;">Quiz criado com sucesso!</p>
-          <a href="${result.url}" target="_blank" style="color: #2563eb; word-break: break-all;">${result.url}</a>
-        </div>
-      `;
+    console.log('Resultado completo da API:', result);
+
+    // A API retorna success=true e um campo 'file' com o nome do arquivo
+    let quizUrl = null;
+
+    if (result.success) {
+      // Montar URL com domínio e vertical do usuário
+      quizUrl = `${domain}quiz/${vertical}/1`;
+    }
+
+    if (quizUrl) {
+      // Mostrar modal com preview do quiz
+      showQuizPreviewModal(quizUrl, modifiedHtml);
 
       // Salvar no histórico
       saveQuizToHistory({
         vertical,
         domain,
-        url: result.url,
+        url: quizUrl,
         questions,
         loadingText,
         awardText,
@@ -215,10 +220,9 @@ window.createQuizLong = async function() {
 
       // Atualizar lista de histórico
       renderQuizHistory('historyList-long', null, null, 'long');
-
-      showNotification('Quiz criado com sucesso!');
     } else {
-      alert('Erro ao criar quiz');
+      console.error('Resposta da API sem URL:', result);
+      alert('Erro ao criar quiz: API não retornou URL. Verifique o console.');
     }
   } catch (error) {
     console.error('Erro ao criar quiz:', error);
@@ -244,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Funções para histórico (expor globalmente)
 window.duplicateQuizFromHistory = function(id, prefix = '') {
-  const history = saveQuizToHistory.getQuizHistory ? saveQuizToHistory.getQuizHistory(prefix) : [];
+  const history = getQuizHistory(prefix);
   const quiz = history.find(item => item.id === id);
 
   if (quiz && prefix === 'long') {
@@ -265,7 +269,6 @@ window.duplicateQuizFromHistory = function(id, prefix = '') {
 
     // Limpar perguntas existentes
     document.getElementById('questionsContainer-long').innerHTML = '';
-    questionCounterLong = 0;
 
     // Recriar perguntas
     if (quiz.questions && Array.isArray(quiz.questions)) {
@@ -308,7 +311,7 @@ window.duplicateQuizFromHistory = function(id, prefix = '') {
 
 window.deleteQuizFromHistory = function(id, prefix = '') {
   if (confirm('Tem certeza que deseja excluir este quiz do histórico?')) {
-    // Função será implementada pelo módulo history.js
+    deleteQuizFromHistory(id, prefix);
     renderQuizHistory('historyList-' + prefix, null, null, prefix);
   }
 };

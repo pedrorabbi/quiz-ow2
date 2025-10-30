@@ -6,11 +6,13 @@ export async function createQuizLink(htmlTemplate, vertical, domain) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-ElegantQuiz-ApiKey': 'cmbr8lju0000009l85ri155xj'
       },
       body: JSON.stringify({
-        vertical: vertical,
-        domain: domain,
-        html: htmlTemplate
+        name: vertical,
+        data: {
+          html_array: [htmlTemplate]
+        }
       })
     });
 
@@ -19,6 +21,7 @@ export async function createQuizLink(htmlTemplate, vertical, domain) {
     }
 
     const result = await response.json();
+    console.log('Resposta da API createQuizLink:', result);
     return result;
   } catch (error) {
     console.error('Erro ao criar link:', error);
