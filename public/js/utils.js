@@ -74,11 +74,6 @@ export function showQuizPreviewModal(quizUrl, quizHtml) {
     </div>
 
     <div class="modal-body">
-      <p style="margin-bottom: 15px;">
-        <strong>URL do Quiz:</strong><br>
-        <a href="${quizUrl}" target="_blank" style="color: #2563eb; word-break: break-all;">${quizUrl}</a>
-      </p>
-
       <div style="margin-top: 20px;">
         <p style="margin-bottom: 10px; font-weight: 600; color: #1f2937;">Preview do Quiz:</p>
         <div style="border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: #f9fafb;">
