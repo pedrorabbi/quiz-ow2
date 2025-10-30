@@ -38,8 +38,47 @@ window.deleteQuizFromHistory = function(id, prefix = '') {
   }
 };
 
-// Inicializar histórico quando a página carregar
+// Função para controlar exibição dos campos de retenção
+function toggleRetentionFields() {
+  const withRetention = document.getElementById("withRetention")?.checked;
+  const retentionFields = document.getElementById("retentionFields");
+  const previewNameContainer = document.getElementById("previewNameInputContainer");
+  const previewEmailContainer = document.getElementById("previewEmailInputContainer");
+
+  if (retentionFields) {
+    if (withRetention) {
+      retentionFields.style.display = "flex";
+      // Mostrar campos no preview
+      if (previewNameContainer) previewNameContainer.style.display = "flex";
+      if (previewEmailContainer) previewEmailContainer.style.display = "flex";
+    } else {
+      retentionFields.style.display = "none";
+      // Esconder campos no preview
+      if (previewNameContainer) previewNameContainer.style.display = "none";
+      if (previewEmailContainer) previewEmailContainer.style.display = "none";
+    }
+
+    // Atualizar preview se a função existir
+    if (window.updatePreview) {
+      window.updatePreview();
+    }
+  }
+}
+
+// Expor função globalmente
+window.toggleRetentionFields = toggleRetentionFields;
+
+// Inicializar histórico e listeners quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
+  // Adicionar listener para o checkbox de retenção
+  const withRetentionCheckbox = document.getElementById("withRetention");
+  if (withRetentionCheckbox) {
+    withRetentionCheckbox.addEventListener("change", toggleRetentionFields);
+    // Inicializar estado
+    toggleRetentionFields();
+  }
+
+  // Carregar histórico após um delay para garantir que script.js foi carregado
   setTimeout(() => {
     if (window.loadQuizHistory) {
       window.loadQuizHistory();

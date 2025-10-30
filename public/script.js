@@ -1104,12 +1104,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Adicionar listener para o checkbox de retenção
-  const withRetentionCheckbox = document.getElementById("withRetention");
-  if (withRetentionCheckbox) {
-    withRetentionCheckbox.addEventListener("change", toggleRetentionFields);
-    // Inicializar estado
-    toggleRetentionFields();
+  // NOTA: O listener para o checkbox de retenção foi movido para ow-padrao.js
+  // para evitar problemas de timing com o carregamento dinâmico do script.js
+  // A inicialização abaixo só é executada se ainda não foi configurada pelo módulo
+  if (!window.toggleRetentionFields) {
+    // Adicionar listener para o checkbox de retenção (fallback)
+    const withRetentionCheckbox = document.getElementById("withRetention");
+    if (withRetentionCheckbox) {
+      withRetentionCheckbox.addEventListener("change", toggleRetentionFields);
+      // Inicializar estado
+      toggleRetentionFields();
+    }
   }
 
   // Configurar drag and drop para blocos já existentes
